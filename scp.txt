@@ -1,0 +1,13 @@
+sudo scp root@192.168.1.55:/mnt/sda1/alvaroSJ.jpg /home/ubuntu-mate/Desktop/traidoYun
+fswebcam -r 320x240 --no-banner alvaro.jpg
+
+
+para sincronizar automáticamente:
+rsync -avz -e ssh root@192.168.1.55:/mnt/sda1/alvaro.jpg /home/ubuntu-mate/Desktop/traidoYun
+
+192.168.240.1:8080
+
+mjpg_streamer -i "input_uvc.so -d /dev/video0 -r 640x480 -f 25" -o "output_http.so -p 8080 -w /www/webcam" &
+mjpg_streamer -i "input_uvc.so -d /dev/video0 -r 320x240 -f 25" -o "output_http.so -p 8080 -w /www/webcam" &
+mjpg_streamer -i "input_opencv.so -d /dev/video0 -r 640x480 -f 25" ..
+mjpg_streamer -i "input_uvc.so -d /dev/video0 -r 640x480 -f 25" -o "output_viewer.so"
