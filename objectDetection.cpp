@@ -20,7 +20,7 @@ void detectAndDisplay( Mat frame );
 
 /** Global variables */
 //-- Note, either copy these two files from opencv/data/haarscascades to your current folder, or change these locations
-String face_cascade_name = "lbpcascade_frontalface.xml";
+String face_cascade_name = "haar/lbpcascade_frontalface.xml";
 //String eyes_cascade_name = "haarcascade_eye_tree_eyeglasses.xml";
 CascadeClassifier face_cascade;
 CascadeClassifier eyes_cascade;
