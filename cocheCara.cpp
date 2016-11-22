@@ -5,6 +5,8 @@
  */
 
 //pkg-config --libs --cflags opencv
+
+//opencv
 #include "opencv2/objdetect/objdetect.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
@@ -26,7 +28,7 @@ using namespace std;
 using namespace cv;
 
 /** Function Headers */
-void detectAndDisplay( Mat frame );
+int detectAndDisplay( Mat frame );
 void enviarYun(int x);
 char * append(char * string1, char * string2);
 void error(const char *msg);
@@ -34,7 +36,7 @@ void error(const char *msg);
 
 /** Global variables */
 
-int sockfd;
+
 //-- Note, either copy these two files from opencv/data/haarscascades to your current folder, or change these locations
 String face_cascade_name = "haar/lbpcascade_frontalface.xml";
 //String eyes_cascade_name = "haarcascade_eye_tree_eyeglasses.xml";
@@ -48,18 +50,20 @@ RNG rng(12345);
  */
 int main( int argc, char *argv[] )
 {
+
+  int x;
   VideoCapture capture( "http://192.168.1.51:8080/?action=stream");
 	//VideoCapture capture( "http://192.168.1.51:8080/stream_simple.html");
   Mat frame;
 
 	//////////////////////////////////////////////////////////////////////////////abrir socket////////////////////////
-	int /*sockfd,*/ portno, n;
+	int sockfd, portno, n;
     struct sockaddr_in serv_addr;
     struct hostent *server;
-
+    
     char buffer[1024];
-	//char nuevo[256];
-	char * nuevo ;
+	char nuevo[256];
+	//char * nuevo ;
 
 
     if (argc < 3) {
@@ -85,6 +89,8 @@ int main( int argc, char *argv[] )
         error("ERROR connecting");
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
   //-- 1. Load the cascades
   if( !face_cascade.load( face_cascade_name ) ){ printf("--(!)Error loading\n"); return -1; };
@@ -109,13 +115,42 @@ do{
       //-- 3. Apply the classifier to the frame
       if( !frame.empty() )
 		{ 
-			detectAndDisplay( frame ); 
+			x = detectAndDisplay( frame );
+			////////////////////////////////////////////////////////////////////////////////////
+				//mensaje espurio para reiniciar parseInt() en arduino
+			strcpy(buffer, "espurio ");
+			n = write(sockfd,buffer,strlen(buffer));
+			printf("%s\n", buffer);
+			if (n < 0) 
+			  error("ERROR escribiendo el mensaje espureo");
+			bzero(buffer,256);
+			
+
+
+			//////////////////añade el dato de la x a continuacion de dato
+			//try{
+			  bzero(nuevo,256);
+			  strcpy(nuevo, "dato    ");
+			  char cadena [9];
+			  snprintf(cadena, sizeof(cadena), "%d", x);
+			  //printf("x: %s\n", cadena);			
+			  for (int i =0; i<9; i++)
+			    {
+			      nuevo[5+i] = cadena[i];
+			    }
+			  printf("%s\n", nuevo);
+			  n = write(sockfd,nuevo,strlen(nuevo));
+			  if (n < 0) 
+			    error("ERROR writing to socket");
+			 
+			//////////////////////////////////////////////////////////////////////////////////////////
+    
 		}
       else
        { printf(" --(!) No captured frame -- Break!"); break; }
 
-      int c = waitKey(10);
-      if( (char)c == 'c' ) { break; }
+      int c = waitKey(1);
+      if( (char)c == 'c'|| c == 27 ) { break; }
 
     }
 	
@@ -131,7 +166,7 @@ do{
 /**
  * @function detectAndDisplay
  */
-void detectAndDisplay( Mat frame )
+int detectAndDisplay( Mat frame )
 {
    std::vector<Rect> faces;
    Mat frame_gray;
@@ -166,36 +201,45 @@ void detectAndDisplay( Mat frame )
 	
    //-- Show what you got
    imshow( window_name, frame );
-	if (faces.size()>0) enviarYun( faces[0].x + faces[0].width/2);
+    return  faces[0].x + faces[0].width/2;
+   
+   /*if (faces.size()>0)*/// enviarYun( faces[0].x + faces[0].width/2);
 }
 void enviarYun(int x)
-{  
-	char buffer[1024];
-	char * nuevo ;
-	int n;
+{/*
+  //string buffer ("olakase ");
+   char  buffer[1024];
+  // char * nuevo ;
+  //char nuevo[1024]; 
+	
 	//mensaje espurio para reiniciar parseInt() en arduino
-	strcpy(buffer, "espurio ");
-	n = write(sockfd,buffer,strlen(buffer));
+  //bzero(buffer,256);
+  //strcpy(buffer, "espurio ");
+	printf("%s   %d\n", buffer,buffer.length());
+	int n;
+	n = write(sockfd,buffer,buffer.length());
 	if (n < 0) 
 	     error("ERROR escribiendo el mensaje espureo");
 
 	//printf("Please enter the message: ");
-	bzero(buffer,256);
+	//bzero(buffer,1024);
 	//fgets(buffer,255,stdin);
 	// append	
 
-	char * s;
-	sprintf(s, "%d", x); 
-	nuevo=append("cadena ",s);
+	//char * s;
+	//sprintf(s, "%d", x); 
+	//nuevo=append("cadena ",s);
+	bzero(nuevo,256);
+	//	strcpy(nuevo, "bueno ");
 	//printf("%s\n", nuevo);
 	//strcat(nuevo,buffer);
-	//printf("%s\n", nuevo);
-	n = write(sockfd,nuevo,strlen(nuevo));
+	printf("%s\n", nuevo);
+	//	n = write(sockfd,nuevo,strlen(nuevo));
 	if (n < 0) 
 	     error("ERROR writing to socket");
 		
 
-
+ */
 }
 char * append(char * string1, char * string2)
 {
