@@ -4,7 +4,7 @@
 #include <YunServer.h>
 #include <YunClient.h>
 
-// Socket port 5555 to communicate.
+// Socket port 9999 to communicate.
 YunServer server(9999);
 
 
@@ -21,7 +21,7 @@ void setup() {
   server.begin();
 
   Serial.begin(9600);
-  Serial.setTimeout(100);
+  Serial.setTimeout(10000);
 }
 
 /**
@@ -47,8 +47,8 @@ void loop() {
           String commandS = client.readStringUntil(' ');// Get the first element of the command.
           if(commandS.length() > 0){
             int command = client.parseInt();// Get the first int
-            Serial.println(commandS); 
-            Serial.println(command); 
+            //Serial.println(commandS); 
+            if (command !=0) Serial.println(command); 
           }
        }
     }
