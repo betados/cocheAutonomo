@@ -29,8 +29,6 @@ using namespace cv;
 
 /** Function Headers */
 int detectAndDisplay( Mat frame );
-void enviarYun(int x);
-char * append(char * string1, char * string2);
 void error(const char *msg);
 
 
@@ -61,9 +59,8 @@ int main( int argc, char *argv[] )
     struct sockaddr_in serv_addr;
     struct hostent *server;
     
-    char buffer[1024];
-	char nuevo[256];
-	//char * nuevo ;
+    char buffer[20];
+    char nuevo[20];
 
 
     if (argc < 3) {
@@ -116,33 +113,41 @@ do{
       if( !frame.empty() )
 		{ 
 			x = detectAndDisplay( frame );
-			////////////////////////////////////////////////////////////////////////////////////
-				//mensaje espurio para reiniciar parseInt() en arduino
-			strcpy(buffer, "espurio ");
-			n = write(sockfd,buffer,strlen(buffer));
-			printf("%s\n", buffer);
-			if (n < 0) 
-			  error("ERROR escribiendo el mensaje espureo");
-			bzero(buffer,256);
+			if (x!=9999)
+			  {
+			    ////////////////////////////////////////////////////////////////////////////////////
+			    //mensaje espurio para reiniciar parseInt() en arduino
+			    strcpy(buffer, "espurio ");
+			    n = write(sockfd,buffer,strlen(buffer));
+			    printf("%s\n", buffer);
+			    if (n < 0) 
+			      error("ERROR escribiendo el mensaje espureo");
+			    bzero(buffer,256);
 			
 
 
-			//////////////////añade el dato de la x a continuacion de dato
-			//try{
-			  bzero(nuevo,256);
-			  strcpy(nuevo, "dato    ");
-			  char cadena [9];
-			  snprintf(cadena, sizeof(cadena), "%d", x);
-			  //printf("x: %s\n", cadena);			
-			  for (int i =0; i<9; i++)
-			    {
-			      nuevo[5+i] = cadena[i];
-			    }
-			  printf("%s\n", nuevo);
-			  n = write(sockfd,nuevo,strlen(nuevo));
-			  if (n < 0) 
-			    error("ERROR writing to socket");
-			 
+			    //////////////////añade el dato de la x a continuacion de dato/////////////////////////////////////////
+			    try///creo que no hace falta esta excepcion, no era aqui donde fallaba 
+			      {
+				bzero(nuevo,256);
+				strcpy(nuevo, "dato    ");
+				char cadena [9];
+				snprintf(cadena, sizeof(cadena), "%d", x);
+				//printf("x: %s\n", cadena);			
+				for (int i =0; i<9; i++)
+				  {
+				    nuevo[5+i] = cadena[i];
+				  }
+				printf("%s\n", nuevo);
+				n = write(sockfd,nuevo,strlen(nuevo));
+				if (n < 0) 
+				  error("ERROR writing to socket");
+			      }
+			    catch (exception& e)
+			      {
+				cout << e.what() << '\n';
+			      }
+			  }
 			//////////////////////////////////////////////////////////////////////////////////////////
     
 		}
@@ -201,52 +206,12 @@ int detectAndDisplay( Mat frame )
 	
    //-- Show what you got
    imshow( window_name, frame );
-    return  faces[0].x + faces[0].width/2;
+   if ( faces.size()>0)    return  faces[0].x + faces[0].width/2;
+   else return 9999;
    
-   /*if (faces.size()>0)*/// enviarYun( faces[0].x + faces[0].width/2);
+    //if (faces.size()>0)*/// enviarYun( faces[0].x + faces[0].width/2);
 }
-void enviarYun(int x)
-{/*
-  //string buffer ("olakase ");
-   char  buffer[1024];
-  // char * nuevo ;
-  //char nuevo[1024]; 
-	
-	//mensaje espurio para reiniciar parseInt() en arduino
-  //bzero(buffer,256);
-  //strcpy(buffer, "espurio ");
-	printf("%s   %d\n", buffer,buffer.length());
-	int n;
-	n = write(sockfd,buffer,buffer.length());
-	if (n < 0) 
-	     error("ERROR escribiendo el mensaje espureo");
 
-	//printf("Please enter the message: ");
-	//bzero(buffer,1024);
-	//fgets(buffer,255,stdin);
-	// append	
-
-	//char * s;
-	//sprintf(s, "%d", x); 
-	//nuevo=append("cadena ",s);
-	bzero(nuevo,256);
-	//	strcpy(nuevo, "bueno ");
-	//printf("%s\n", nuevo);
-	//strcat(nuevo,buffer);
-	printf("%s\n", nuevo);
-	//	n = write(sockfd,nuevo,strlen(nuevo));
-	if (n < 0) 
-	     error("ERROR writing to socket");
-		
-
- */
-}
-char * append(char * string1, char * string2)
-{
-    char * result = NULL;
-    asprintf(&result, "%s%s", string1, string2);
-    return result;
-}
 
 void error(const char *msg)
 {
