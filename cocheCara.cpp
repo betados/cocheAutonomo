@@ -1,7 +1,6 @@
 /**
- * @file objectDetection.cpp
- * @author A. Huaman ( based in the classic facedetect.cpp in samples/c )
- * @brief A simplified version of facedetect.cpp, show how to load a cascade classifier and how to find objects (Face + eyes) in a video stream
+
+Recibe la imagen, la analiza y reenvia por socket los datos 
  */
 
 //pkg-config --libs --cflags opencv
@@ -50,7 +49,7 @@ int main( int argc, char *argv[] )
 {
 
   int x;
-  VideoCapture capture( "http://192.168.1.51:8080/?action=stream");
+  VideoCapture capture( "http://192.168.240.1:8080/?action=stream");
 	//VideoCapture capture( "http://192.168.1.51:8080/stream_simple.html");
   Mat frame;
 
@@ -95,7 +94,7 @@ int main( int argc, char *argv[] )
 
   //-- 2. Read the video stream
 do{
-  capture.open( "http://192.168.1.51:8080/?action=stream");
+  capture.open( "http://192.168.240.1:8080/?action=stream");
 	
 }while(!capture.isOpened());
 //capture.open( "http://192.168.1.51:8080/stream_simple.html");
@@ -113,8 +112,7 @@ do{
       if( !frame.empty() )
 		{ 
 			x = detectAndDisplay( frame );
-			if (x!=9999)
-			  {
+			//if (x!=9999)			  {
 			    ////////////////////////////////////////////////////////////////////////////////////
 			    //mensaje espurio para reiniciar parseInt() en arduino
 			    strcpy(buffer, "espurio ");
@@ -147,7 +145,7 @@ do{
 			      {
 				cout << e.what() << '\n';
 			      }
-			  }
+			    // }
 			//////////////////////////////////////////////////////////////////////////////////////////
     
 		}

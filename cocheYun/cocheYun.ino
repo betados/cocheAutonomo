@@ -1,5 +1,5 @@
 /*
- * Recibe un dato por socket y gira la direccion
+ * Recibe un dato por socket, avanza y gira la direccion en ese sentido. si no hay dato para. 
  */
 
 #include <Bridge.h>
@@ -10,7 +10,12 @@
 
 #include <Servo.h>
 
-//SERVO DIRECCION
+////DRIVER MOTOR/////////////////
+int IN3 = 12;    // Input3 conectada al pin 12
+int IN4 = 13;    // Input4 conectada al pin 13 
+int ENB = 11;    // ENB conectada al pin 11 de Arduino para PWM
+
+//SERVO DIRECCION////////////////////////
 #define RANGO 21
 #define CENTRO 75
 int MIN = CENTRO-RANGO;
@@ -40,6 +45,11 @@ void setup() {
   Serial.begin(9600);
   Serial.setTimeout(10000);
   myservo.attach(3);  // attaches the servo on pin 9 to the servo object
+
+  //MOTOR////
+  pinMode (ENB, OUTPUT); 
+  pinMode (IN3, OUTPUT);
+  pinMode (IN4, OUTPUT);
 }
 
 /**
@@ -66,20 +76,25 @@ void loop() {
           if(commandS.length() > 0){
             int command = client.parseInt();// Get the first int
             //Serial.println(commandS); 
-            if (command !=0)
+            if (command !=0 && command != 9999)
             {
               Serial.println(command); 
+              adelante(100);
               gira(command);
             }
+            else freno();
           }
        }
+       else freno();
     }
     
     // Close connection and free resources.
     client.stop();
+    freno();
   }
   else {
     Serial.println("no client connected, retrying");
+    freno();
     delay(1000);
   }
 }
@@ -87,6 +102,18 @@ void gira(int aonde)
 {
   if (aonde > 320) myservo.write(MIN);
   else myservo.write(MAX);   
+}
+
+void adelante(int velocidad)
+{
+  digitalWrite (IN3, LOW);
+  digitalWrite (IN4, HIGH);
+  analogWrite(ENB,velocidad);
+}
+void freno()
+{
+  digitalWrite (IN3, LOW);
+  digitalWrite (IN4, LOW);
 }
 
 

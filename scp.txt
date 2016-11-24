@@ -11,3 +11,6 @@ mjpg_streamer -i "input_uvc.so -d /dev/video0 -r 640x480 -f 25" -o "output_http.
 mjpg_streamer -i "input_uvc.so -d /dev/video0 -r 320x240 -f 25" -o "output_http.so -p 8080 -w /www/webcam" &
 mjpg_streamer -i "input_opencv.so -d /dev/video0 -r 640x480 -f 25" ..
 mjpg_streamer -i "input_uvc.so -d /dev/video0 -r 640x480 -f 25" -o "output_viewer.so"
+
+sh /mnt/sda1/arduino/www/coche/ejecutar.sh
+
