@@ -79,7 +79,7 @@ void loop() {
             if (command !=0 && command != 9999)
             {
               Serial.println(command); 
-              adelante(100);
+              adelante(200);
               gira(command);
             }
             else freno();
