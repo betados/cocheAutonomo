@@ -27,7 +27,7 @@ using namespace std;
 using namespace cv;
 
 /** Function Headers */
-int detectAndDisplay( Mat frame );
+int detectAndDisplay(  Mat frame, int *jx, int *jTamano );
 void error(const char *msg);
 
 
@@ -49,7 +49,14 @@ int main( int argc, char *argv[] )
 {
 
   int x;
-  VideoCapture capture( "http://192.168.240.1:8080/?action=stream");
+  int pruebaX=0,pruebaTamano=0;
+  int *jx = &pruebaX; int *jTamano=&pruebaTamano;
+  String ipVideo = "http://";
+  ipVideo.append( argv[1]);
+  cout<<ipVideo<<endl;
+  ipVideo.append(":8080/?action=stream");
+  cout<<ipVideo<<endl;
+  VideoCapture capture(ipVideo);
 	//VideoCapture capture( "http://192.168.1.51:8080/stream_simple.html");
   Mat frame;
 
@@ -94,7 +101,7 @@ int main( int argc, char *argv[] )
 
   //-- 2. Read the video stream
 do{
-  capture.open( "http://192.168.240.1:8080/?action=stream");
+  capture.open( ipVideo);
 	
 }while(!capture.isOpened());
 //capture.open( "http://192.168.1.51:8080/stream_simple.html");
@@ -111,7 +118,7 @@ do{
       //-- 3. Apply the classifier to the frame
       if( !frame.empty() )
 		{ 
-			x = detectAndDisplay( frame );
+		  x = detectAndDisplay( frame,jx ,jTamano  );
 			//if (x!=9999)			  {
 			    ////////////////////////////////////////////////////////////////////////////////////
 			    //mensaje espurio para reiniciar parseInt() en arduino
@@ -121,6 +128,8 @@ do{
 			    if (n < 0) 
 			      error("ERROR escribiendo el mensaje espureo");
 			    bzero(buffer,256);
+			    cout<<*jx<<" , "<<*jTamano<<endl;
+			    printf("%d , %d\n",*jx, *jTamano);
 			
 
 
@@ -169,7 +178,7 @@ do{
 /**
  * @function detectAndDisplay
  */
-int detectAndDisplay( Mat frame )
+int detectAndDisplay( Mat frame, int *jx, int *jTamano )
 {
    std::vector<Rect> faces;
    Mat frame_gray;
@@ -177,7 +186,7 @@ int detectAndDisplay( Mat frame )
    cvtColor( frame, frame_gray, COLOR_BGR2GRAY );
    equalizeHist( frame_gray, frame_gray );
    //-- Detect faces
-   face_cascade.detectMultiScale( frame_gray, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE, Size(80, 80) );
+   face_cascade.detectMultiScale( frame_gray, faces, 1.1, 5, 0|CV_HAAR_SCALE_IMAGE, Size(40, 40) );
 
    for( size_t i = 0; i < faces.size(); i++ )
     {
@@ -204,7 +213,13 @@ int detectAndDisplay( Mat frame )
 	
    //-- Show what you got
    imshow( window_name, frame );
-   if ( faces.size()>0)    return  faces[0].x + faces[0].width/2;
+   if ( faces.size()>0){
+     
+     //int xProvisional= faces[0].x + faces[0].width/2;
+     *jx= faces[0].x + faces[0].width/2; //xProvisional;
+     *jTamano = faces[0].width/2;
+     return  faces[0].x + faces[0].width/2;
+   }
    else return 9999;
    
     //if (faces.size()>0)*/// enviarYun( faces[0].x + faces[0].width/2);
