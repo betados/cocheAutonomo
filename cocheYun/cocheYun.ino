@@ -16,7 +16,7 @@ int IN4 = 13;    // Input4 conectada al pin 13
 int ENB = 11;    // ENB conectada al pin 11 de Arduino para PWM
 
 //SERVO DIRECCION////////////////////////
-#define RANGO 21
+#define RANGO 20
 #define CENTRO 75
 int MIN = CENTRO-RANGO;
 int MAX = CENTRO+RANGO+0;
@@ -28,6 +28,10 @@ Servo myservo;  // create servo object to control a servo
 
 // Socket port 9999 to communicate.
 YunServer server(9999);
+
+
+int ancho=320;
+bool atras=false;
 
 
 /**
@@ -83,6 +87,7 @@ void loop() {
               Serial.println(command); 
               gira(command);
             }
+            else freno();
           }
           if (commandS=="tamano"){
             int command = client.parseInt();// Get the first int
@@ -91,9 +96,19 @@ void loop() {
             {
               Serial.print(commandS);
               Serial.println(command); 
-              if (command < 110) adelante(125);
-              else freno();
+              if (command < (ancho/7)-10 ){
+                adelante(255-((255*7)/ancho)*command);
+              }
+              else if (command > (ancho/7)+10 ){
+                      atrasF(125);
+                    }
+                    else freno();
             }
+            else freno();
+          }
+          if (commandS=="ancho"){
+            int command = client.parseInt();// Get the first int
+            ancho = command;
           }
        }
     }
@@ -110,8 +125,15 @@ void loop() {
 }
 void gira(int aonde)
 {
-  if (aonde > 320) myservo.write(MIN);
-  else myservo.write(MAX);   
+  if (atras == false){
+    if (aonde > (ancho/2.0f)) myservo.write(MIN);
+    else myservo.write(MAX);   
+  }
+  if (atras == true){
+    if (aonde > (ancho/2.0f)) myservo.write(MAX);
+    else myservo.write(MIN);   
+  }
+  
 }
 
 void adelante(int velocidad)
@@ -119,6 +141,14 @@ void adelante(int velocidad)
   digitalWrite (IN3, LOW);
   digitalWrite (IN4, HIGH);
   analogWrite(ENB,velocidad);
+  atras=false;
+}
+void atrasF(int velocidad)
+{
+  digitalWrite (IN3, HIGH);
+  digitalWrite (IN4, LOW);
+  analogWrite(ENB,velocidad);
+  atras=true;
 }
 void freno()
 {

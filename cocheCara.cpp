@@ -57,6 +57,8 @@ int main( int argc, char *argv[] )
   ipVideo.append(":8080/?action=stream");
   cout<<ipVideo<<endl;
   VideoCapture capture(ipVideo);
+  //capture.set(CV_CAP_PROP_FRAME_WIDTH,320);
+  // capture.set(CV_CAP_PROP_FRAME_HEIGHT,240);
 	//VideoCapture capture( "http://192.168.1.51:8080/stream_simple.html");
   Mat frame;
 
@@ -105,6 +107,8 @@ int main( int argc, char *argv[] )
   //-- 2. Read the video stream
 do{
   capture.open( ipVideo);
+  capture.set(CV_CAP_PROP_FRAME_WIDTH,320);
+  capture.set(CV_CAP_PROP_FRAME_HEIGHT,240);
 	
 }while(!capture.isOpened());
 //capture.open( "http://192.168.1.51:8080/stream_simple.html");
@@ -172,6 +176,12 @@ do{
 			      }
 			    printf("%s\n", tamano);
 			    n = write(sockfd,tamano,strlen(tamano));
+			    if (n < 0) 
+			      error("ERROR writing to socket");
+
+			    char ancho [9];
+			    strcpy(ancho, "ancho 320");
+			     n = write(sockfd,ancho,strlen(ancho));
 			    if (n < 0) 
 			      error("ERROR writing to socket");
 
