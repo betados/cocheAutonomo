@@ -31,7 +31,7 @@ YunServer server(9999);
 
 
 int ancho=320;
-bool atras=false;
+
 
 
 /**
@@ -62,6 +62,8 @@ void setup() {
 * Wait for a client then process it when he's found.
 */
 void loop() {
+  bool atras=false;
+  bool *pAtras=&atras;
   // Get clients coming from server
   YunClient client = server.accept();
 
@@ -77,38 +79,23 @@ void loop() {
        if (client.available())
        {
           String commandS = client.readStringUntil(' ');// Get the first element of the command.
-          //if(commandS.length() > 0){
-          if (commandS=="equis"){
-            int command = client.parseInt();// Get the first int
-            //Serial.println(commandS); 
-            if (command !=0 && command != 9999)
-            {
-              Serial.print(commandS);
-              Serial.println(command); 
-              gira(command);
+          int command = client.parseInt();// Get the first int
+          if (command==9999 || command == 0) freno();
+          else{
+            if (commandS=="equis"){
+              //Serial.print(commandS);
+              //Serial.println(command); 
+              gira(command,atras);
             }
-            else freno();
-          }
-          if (commandS=="tamano"){
-            int command = client.parseInt();// Get the first int
-            //Serial.println(commandS); 
-            if (command !=0 && command != 9999)
-            {
-              Serial.print(commandS);
-              Serial.println(command); 
-              if (command < (ancho/7)-10 ){
-                adelante(255-((255*7)/ancho)*command);
-              }
-              else if (command > (ancho/7)+10 ){
-                      atrasF(125);
-                    }
-                    else freno();
+            if (commandS=="tamano"){
+              //Serial.print(commandS);
+              //Serial.println(command);
+              mueve(command,pAtras); 
             }
-            else freno();
-          }
-          if (commandS=="ancho"){
-            int command = client.parseInt();// Get the first int
-            ancho = command;
+            if (commandS=="ancho"){
+              ancho = command;
+              Serial.println(ancho);
+            }
           }
        }
     }
@@ -123,8 +110,10 @@ void loop() {
     delay(1000);
   }
 }
-void gira(int aonde)
+void gira(int aonde, bool atras)
 {
+  Serial.print("Marcha Atras= ");
+  Serial.println(atras);
   if (atras == false){
     if (aonde > (ancho/2.0f)) myservo.write(MIN);
     else myservo.write(MAX);   
@@ -136,24 +125,50 @@ void gira(int aonde)
   
 }
 
-void adelante(int velocidad)
+void adelante(int velocidad, bool *pAtras)
 {
+  if (velocidad >255 ) velocidad = 255;
+  if (velocidad < 80 ) velocidad = 80;
   digitalWrite (IN3, LOW);
   digitalWrite (IN4, HIGH);
   analogWrite(ENB,velocidad);
-  atras=false;
+  *pAtras=false;
 }
-void atrasF(int velocidad)
+void atrasF(int velocidad,bool *pAtras)
 {
+  if (velocidad >255 ) velocidad = 255;
+  if (velocidad < 80 ) velocidad = 80;
   digitalWrite (IN3, HIGH);
   digitalWrite (IN4, LOW);
   analogWrite(ENB,velocidad);
-  atras=true;
+  *pAtras=true;
 }
 void freno()
 {
-  digitalWrite (IN3, LOW);
-  digitalWrite (IN4, LOW);
+  digitalWrite (IN3, HIGH);
+  digitalWrite (IN4, HIGH);
+  analogWrite(ENB,255);
+}
+void mueve(float tamano, bool *pAtras){
+  float distancia = 1/tamano;
+  //Serial.print("Distancia= ");
+  //Serial.println(distancia);
+  float distanciaConsigna=50/ancho;
+  float error = distancia -distanciaConsigna;
+  static float errorAnterior=0;
+  float dE = errorAnterior-error; 
+  
+  int velocidad = error * /*KP*/  6000  /* + dE * kd 1*/;
+  Serial.print("Velocidad= ");
+  Serial.println(velocidad);
+  if (velocidad>0) adelante(velocidad,pAtras);
+  else{
+    velocidad = velocidad *-1;
+    atrasF(velocidad,pAtras);    
+  }
+  
+  errorAnterior = error;
+  
 }
 
 

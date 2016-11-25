@@ -180,7 +180,7 @@ do{
 			      error("ERROR writing to socket");
 
 			    char ancho [9];
-			    strcpy(ancho, "ancho 320");
+			    strcpy(ancho, "ancho 640");
 			     n = write(sockfd,ancho,strlen(ancho));
 			    if (n < 0) 
 			      error("ERROR writing to socket");

@@ -13,19 +13,20 @@ void setup()
 }
 void loop()
 {
-  for (int i = 60; i<255; i++)
+  for (int i = 60; i<256; i++)
   {
     adelante(i);
     delay(20);
   }
   freno();
-  //delay(1000);
-  for (int i = 60; i<255; i++)
+  delay(1000);
+  for (int i = 60; i<256; i++)
   {
     atras(i);
     delay(20);
   }
   freno();
+  delay(5000);
 }
 void atras(int velocidad)
 {
@@ -41,7 +42,8 @@ void adelante(int velocidad)
 }
 void freno()
 {
-  digitalWrite (IN3, LOW);
-  digitalWrite (IN4, LOW);
+  digitalWrite (IN3, HIGH);
+  digitalWrite (IN4, HIGH);
+  analogWrite(ENB,255);
 }
 
