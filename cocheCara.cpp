@@ -48,7 +48,7 @@ RNG rng(12345);
 int main( int argc, char *argv[] )
 {
 
-  int x;
+  int x=0;
   int pruebaX=0,pruebaTamano=0;
   int *jx = &pruebaX; int *jTamano=&pruebaTamano;
   String ipVideo = "http://";
@@ -65,8 +65,11 @@ int main( int argc, char *argv[] )
     struct sockaddr_in serv_addr;
     struct hostent *server;
     
-    char buffer[20];
-    char nuevo[20];
+    char limpia[20];
+    strcpy(limpia, "limpia ");
+    char equis[20];
+    char cadena [9];
+    char tamano[20];
 
 
     if (argc < 3) {
@@ -119,34 +122,34 @@ do{
       if( !frame.empty() )
 		{ 
 		  x = detectAndDisplay( frame,jx ,jTamano  );
+		  if (x==9999) *jTamano=9999;
 			//if (x!=9999)			  {
 			    ////////////////////////////////////////////////////////////////////////////////////
 			    //mensaje espurio para reiniciar parseInt() en arduino
-			    strcpy(buffer, "espurio ");
-			    n = write(sockfd,buffer,strlen(buffer));
-			    printf("%s\n", buffer);
+			    
+			    n = write(sockfd,limpia,strlen(limpia));
+			    printf("%s\n", limpia);
 			    if (n < 0) 
 			      error("ERROR escribiendo el mensaje espureo");
-			    bzero(buffer,256);
-			    cout<<*jx<<" , "<<*jTamano<<endl;
-			    printf("%d , %d\n",*jx, *jTamano);
+			    //bzero(limpia,256);
+			    //cout<<*jx<<" , "<<*jTamano<<endl;
+			    //printf("%d , %d\n",*jx, *jTamano);
 			
 
 
 			    //////////////////añade el dato de la x a continuacion de dato/////////////////////////////////////////
 			    try///creo que no hace falta esta excepcion, no era aqui donde fallaba 
 			      {
-				bzero(nuevo,256);
-				strcpy(nuevo, "dato    ");
-				char cadena [9];
-				snprintf(cadena, sizeof(cadena), "%d", x);
+				bzero(equis,256);
+				strcpy(equis, "equis    ");				
+				snprintf(cadena, sizeof(cadena), "%d", x);//creo que transforma x en una cadena
 				//printf("x: %s\n", cadena);			
 				for (int i =0; i<9; i++)
 				  {
-				    nuevo[5+i] = cadena[i];
+				    equis[6+i] = cadena[i];
 				  }
-				printf("%s\n", nuevo);
-				n = write(sockfd,nuevo,strlen(nuevo));
+				printf("%s\n", equis);
+				n = write(sockfd,equis,strlen(equis));
 				if (n < 0) 
 				  error("ERROR writing to socket");
 			      }
@@ -154,6 +157,25 @@ do{
 			      {
 				cout << e.what() << '\n';
 			      }
+
+			    n = write(sockfd,limpia,strlen(limpia));
+			    printf("%s\n", limpia);
+			    if (n < 0)  error("ERROR escribiendo el mensaje espureo");
+
+			    bzero(tamano,256);
+			    strcpy(tamano, "tamano    ");				
+			    snprintf(cadena, sizeof(cadena), "%d", *jTamano);//creo que transforma x en una cadena
+			    //printf("x: %s\n", cadena);			
+			    for (int i =0; i<9; i++)
+			      {
+				tamano[7+i] = cadena[i];
+			      }
+			    printf("%s\n", tamano);
+			    n = write(sockfd,tamano,strlen(tamano));
+			    if (n < 0) 
+			      error("ERROR writing to socket");
+
+			    
 			    // }
 			//////////////////////////////////////////////////////////////////////////////////////////
     

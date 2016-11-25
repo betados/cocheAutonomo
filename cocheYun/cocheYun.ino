@@ -73,19 +73,29 @@ void loop() {
        if (client.available())
        {
           String commandS = client.readStringUntil(' ');// Get the first element of the command.
-          if(commandS.length() > 0){
+          //if(commandS.length() > 0){
+          if (commandS=="equis"){
             int command = client.parseInt();// Get the first int
             //Serial.println(commandS); 
             if (command !=0 && command != 9999)
             {
+              Serial.print(commandS);
               Serial.println(command); 
-              adelante(200);
               gira(command);
             }
-            else freno();
+          }
+          if (commandS=="tamano"){
+            int command = client.parseInt();// Get the first int
+            //Serial.println(commandS); 
+            if (command !=0 && command != 9999)
+            {
+              Serial.print(commandS);
+              Serial.println(command); 
+              if (command < 110) adelante(125);
+              else freno();
+            }
           }
        }
-       else freno();
     }
     
     // Close connection and free resources.
