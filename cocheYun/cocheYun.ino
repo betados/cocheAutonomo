@@ -31,6 +31,7 @@ YunServer server(9999);
 
 
 int ancho=320;
+int kp=40,kd=30;
 
 
 
@@ -78,6 +79,9 @@ void loop() {
     {
        if (client.available())
        {
+          //kd = Serial.parseInt();
+          //Serial.print("Konstante derivativa: ");
+         //Serial.println(kd);
           String commandS = client.readStringUntil(' ');// Get the first element of the command.
           int command = client.parseInt();// Get the first int
           if (command==9999 || command == 0) freno();
@@ -94,7 +98,7 @@ void loop() {
             }
             if (commandS=="ancho"){
               ancho = command;
-              Serial.println(ancho);
+              //Serial.println(ancho);
             }
           }
        }
@@ -112,8 +116,8 @@ void loop() {
 }
 void gira(int aonde, bool atras)
 {
-  Serial.print("Marcha Atras= ");
-  Serial.println(atras);
+  //Serial.print("Marcha Atras= ");
+  //Serial.println(atras);
   
   if (atras == false){
     if (aonde > (ancho/2.0f)) myservo.write(MIN);
@@ -129,7 +133,7 @@ void gira(int aonde, bool atras)
 void adelante(int velocidad, bool *pAtras)
 {
   if (velocidad >255 ) velocidad = 255;
-  if (velocidad < 80 ) velocidad = 80;
+  if (velocidad < 100 ) velocidad = 100;
   digitalWrite (IN3, LOW);
   digitalWrite (IN4, HIGH);
   analogWrite(ENB,velocidad);
@@ -139,7 +143,7 @@ void adelante(int velocidad, bool *pAtras)
 void atrasF(int velocidad,bool *pAtras)
 {
   if (velocidad >255 ) velocidad = 255;
-  if (velocidad < 80 ) velocidad = 80;
+  if (velocidad < 100 ) velocidad = 100;
   digitalWrite (IN3, HIGH);
   digitalWrite (IN4, LOW);
   analogWrite(ENB,velocidad);
@@ -157,18 +161,21 @@ void mueve(float tamano, bool *pAtras){
   float distancia = ancho/tamano;
   //Serial.print("Distancia= ");
   //Serial.println(distancia);
-  float distanciaConsigna=ancho/50; //el denominador es el tamaño de la jeta //mas pequeña más lejano el cambio
+  float distanciaConsigna=8/*ancho/40*/; //el denominador es el tamaño de la jeta //mas pequeña más lejano el cambio
   float error = distancia -distanciaConsigna;
   static float errorAnterior=0;
-  float dE = errorAnterior-error; 
+  float dE = error - errorAnterior; 
   
-  int velocidad = error * /*KP*/  30  /* + dE * kd 1*/;
-  Serial.print("Velocidad= ");
-  Serial.println(velocidad);
-  if (velocidad>0) adelante(velocidad,pAtras);
-  else{
-    velocidad = velocidad *-1;
-    atrasF(velocidad,pAtras);    
+  int velocidad = error * /*KP*/ kp  + dE * kd;
+  //Serial.print("Velocidad= ");
+  //Serial.println(velocidad);
+  if (velocidad>50) adelante(velocidad,pAtras);
+  else{ 
+    if (velocidad<-50){
+            velocidad = velocidad *-1;
+            atrasF(velocidad,pAtras);  
+    }
+    else freno(); 
   }
   
   errorAnterior = error;

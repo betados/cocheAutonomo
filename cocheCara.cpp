@@ -55,17 +55,17 @@ int main( int argc, char *argv[] )
   int pruebaX=0,pruebaTamano=0;
   int *jx = &pruebaX; int *jTamano=&pruebaTamano;
   String ipVideo = "http://";
+  //String ipVideo = "http://192.168.1.55:8080/?action=stream?dummy=param.jpeg";
    int resolucion  = atoi(argv[3]);
   //String resolucion = "ancho ";
-  ipVideo.append( argv[1]);
+  ipVideo.append( argv[1]);//////////////////////
   //resolucion.append( argv[3]);
   cout<<ipVideo<<endl;
-  ipVideo.append(":8080/?action=stream");
+  ipVideo.append(":8080/?action=stream");///////////////
   cout<<ipVideo<<endl;
   VideoCapture capture(ipVideo);
   
-  //capture.set(CV_CAP_PROP_FRAME_WIDTH,320);
-  // capture.set(CV_CAP_PROP_FRAME_HEIGHT,240);
+ 
 	//VideoCapture capture( "http://192.168.1.51:8080/stream_simple.html");
   Mat frame;
 
@@ -81,8 +81,8 @@ int main( int argc, char *argv[] )
     char tamano[20];
 
 
-    if (argc < 3) {
-       fprintf(stderr,"usage %s hostname port\n", argv[0]);
+    if (argc < 4) {
+       fprintf(stderr,"usage %s ip_hostname puerto resolucion\n", argv[0]);
        exit(0);
     }
     portno = atoi(argv[2]);
@@ -112,12 +112,29 @@ int main( int argc, char *argv[] )
   //if( !eyes_cascade.load( eyes_cascade_name ) ){ printf("--(!)Error loading\n"); return -1; };
 
   //-- 2. Read the video stream
-do{
-  capture.open( ipVideo);
-  //capture.set(CV_CAP_PROP_FRAME_WIDTH,320);
-  //capture.set(CV_CAP_PROP_FRAME_HEIGHT,240);
-	
-}while(!capture.isOpened());
+  int  contador=0;
+   capture.open( ipVideo);
+ if (resolucion == 320) {
+    capture.set(CV_CAP_PROP_FRAME_WIDTH,320);
+    capture.set(CV_CAP_PROP_FRAME_HEIGHT,240);
+    cout<<"RESOLUCION"<<endl;
+  }
+
+   
+   /*do{
+     capture.open( ipVideo);
+     //capture.set(CV_CAP_PROP_FRAME_WIDTH,320);
+     //capture.set(CV_CAP_PROP_FRAME_HEIGHT,240);
+     contador++;
+     cout<<contador<<endl;
+     if (contador>999){
+     cout<<"Esto no arranca"<<endl;
+     break;
+  }
+  	
+  }while(!capture.isOpened());*/
+
+   
 //capture.open( "http://192.168.1.51:8080/stream_simple.html");
 
   //capture.set(CV_CAP_PROP_FRAME_WIDTH,320);
@@ -127,11 +144,15 @@ do{
   {
     for(;;)
     {
-      capture >> frame;
+
+      capture.read(frame);
+      resize(frame, frame, Size(320, 240), 0, 0, INTER_CUBIC);
+	//capture >> frame;
 
       //-- 3. Apply the classifier to the frame
       if( !frame.empty() )
-		{ 
+		{
+		  //cvtColor( frame, frame, COLOR_BGR2GRAY );
 		  x = detectAndDisplay( frame,jx ,jTamano  );
 		  if (x==9999) *jTamano=9999;
 			//if (x!=9999)			  {
@@ -207,11 +228,12 @@ do{
     }
 	
   }
-	else printf("mierda pa ti\n");
+  else printf("mierda pa ti\n");
 	
 
 ////cierra socket
     close(sockfd);
+    //cvReleaseCapture();
   return 0;
 }
 
