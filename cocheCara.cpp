@@ -1,6 +1,9 @@
 /**
 
 Recibe la imagen, la analiza y reenvia por socket los datos 
+primer parametro: ip servidor
+segundo: puerto de la comunicacion socket
+tercer: ancho resolucion captura
  */
 
 //pkg-config --libs --cflags opencv
@@ -52,11 +55,15 @@ int main( int argc, char *argv[] )
   int pruebaX=0,pruebaTamano=0;
   int *jx = &pruebaX; int *jTamano=&pruebaTamano;
   String ipVideo = "http://";
+   int resolucion  = atoi(argv[3]);
+  //String resolucion = "ancho ";
   ipVideo.append( argv[1]);
+  //resolucion.append( argv[3]);
   cout<<ipVideo<<endl;
   ipVideo.append(":8080/?action=stream");
   cout<<ipVideo<<endl;
   VideoCapture capture(ipVideo);
+  
   //capture.set(CV_CAP_PROP_FRAME_WIDTH,320);
   // capture.set(CV_CAP_PROP_FRAME_HEIGHT,240);
 	//VideoCapture capture( "http://192.168.1.51:8080/stream_simple.html");
@@ -107,8 +114,8 @@ int main( int argc, char *argv[] )
   //-- 2. Read the video stream
 do{
   capture.open( ipVideo);
-  capture.set(CV_CAP_PROP_FRAME_WIDTH,320);
-  capture.set(CV_CAP_PROP_FRAME_HEIGHT,240);
+  //capture.set(CV_CAP_PROP_FRAME_WIDTH,320);
+  //capture.set(CV_CAP_PROP_FRAME_HEIGHT,240);
 	
 }while(!capture.isOpened());
 //capture.open( "http://192.168.1.51:8080/stream_simple.html");
@@ -180,7 +187,8 @@ do{
 			      error("ERROR writing to socket");
 
 			    char ancho [9];
-			    strcpy(ancho, "ancho 640");
+			    if ( resolucion==320) strcpy(ancho, "ancho 320");
+			    else strcpy(ancho, "ancho 640");
 			     n = write(sockfd,ancho,strlen(ancho));
 			    if (n < 0) 
 			      error("ERROR writing to socket");

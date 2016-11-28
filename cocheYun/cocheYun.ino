@@ -12,11 +12,11 @@
 
 ////DRIVER MOTOR/////////////////
 int IN3 = 12;    // Input3 conectada al pin 12
-int IN4 = 13;    // Input4 conectada al pin 13 
+int IN4 = 10;    // Input4 conectada al pin 10
 int ENB = 11;    // ENB conectada al pin 11 de Arduino para PWM
 
 //SERVO DIRECCION////////////////////////
-#define RANGO 20
+#define RANGO 19
 #define CENTRO 75
 int MIN = CENTRO-RANGO;
 int MAX = CENTRO+RANGO+0;
@@ -114,6 +114,7 @@ void gira(int aonde, bool atras)
 {
   Serial.print("Marcha Atras= ");
   Serial.println(atras);
+  
   if (atras == false){
     if (aonde > (ancho/2.0f)) myservo.write(MIN);
     else myservo.write(MAX);   
@@ -132,6 +133,7 @@ void adelante(int velocidad, bool *pAtras)
   digitalWrite (IN3, LOW);
   digitalWrite (IN4, HIGH);
   analogWrite(ENB,velocidad);
+  //analogWrite(ENB,0);
   *pAtras=false;
 }
 void atrasF(int velocidad,bool *pAtras)
@@ -141,6 +143,7 @@ void atrasF(int velocidad,bool *pAtras)
   digitalWrite (IN3, HIGH);
   digitalWrite (IN4, LOW);
   analogWrite(ENB,velocidad);
+  //analogWrite(ENB,0);
   *pAtras=true;
 }
 void freno()
@@ -150,15 +153,16 @@ void freno()
   analogWrite(ENB,255);
 }
 void mueve(float tamano, bool *pAtras){
-  float distancia = 1/tamano;
+  //tamano = tamano / ancho;
+  float distancia = ancho/tamano;
   //Serial.print("Distancia= ");
   //Serial.println(distancia);
-  float distanciaConsigna=50/ancho;
+  float distanciaConsigna=ancho/50; //el denominador es el tamaño de la jeta //mas pequeña más lejano el cambio
   float error = distancia -distanciaConsigna;
   static float errorAnterior=0;
   float dE = errorAnterior-error; 
   
-  int velocidad = error * /*KP*/  6000  /* + dE * kd 1*/;
+  int velocidad = error * /*KP*/  40  /* + dE * kd 1*/;
   Serial.print("Velocidad= ");
   Serial.println(velocidad);
   if (velocidad>0) adelante(velocidad,pAtras);
