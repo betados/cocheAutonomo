@@ -31,7 +31,8 @@ YunServer server(9999);
 
 
 int ancho=320;
-int kp=40,kd=30;
+int kp=35,kd=50;
+float ki=0.1f;
 
 
 
@@ -133,7 +134,7 @@ void gira(int aonde, bool atras)
 void adelante(int velocidad, bool *pAtras)
 {
   if (velocidad >255 ) velocidad = 255;
-  if (velocidad < 100 ) velocidad = 100;
+  //if (velocidad < 100 ) velocidad = 100;
   digitalWrite (IN3, LOW);
   digitalWrite (IN4, HIGH);
   analogWrite(ENB,velocidad);
@@ -143,7 +144,7 @@ void adelante(int velocidad, bool *pAtras)
 void atrasF(int velocidad,bool *pAtras)
 {
   if (velocidad >255 ) velocidad = 255;
-  if (velocidad < 100 ) velocidad = 100;
+  //if (velocidad < 100 ) velocidad = 100;
   digitalWrite (IN3, HIGH);
   digitalWrite (IN4, LOW);
   analogWrite(ENB,velocidad);
@@ -164,21 +165,32 @@ void mueve(float tamano, bool *pAtras){
   float distanciaConsigna=8/*ancho/40*/; //el denominador es el tamaño de la jeta //mas pequeña más lejano el cambio
   float error = distancia -distanciaConsigna;
   static float errorAnterior=0;
-  float dE = error - errorAnterior; 
+  static float errorAcumulado=errorAcumulado+error;
   
-  int velocidad = error * /*KP*/ kp  + dE * kd;
-  //Serial.print("Velocidad= ");
-  //Serial.println(velocidad);
-  if (velocidad>50) adelante(velocidad,pAtras);
-  else{ 
-    if (velocidad<-50){
-            velocidad = velocidad *-1;
-            atrasF(velocidad,pAtras);  
-    }
-    else freno(); 
+  
+  float dE = error - errorAnterior; 
+
+  if ( error<0  || error>0 ) {
+      int velocidad = error * /*KP*/ kp  + dE * kd + errorAcumulado * ki;
+      //Serial.print("Velocidad= ");
+      //Serial.println(velocidad);
+      if (velocidad>0) adelante(velocidad,pAtras);
+      else{ 
+        if (velocidad<0){
+                velocidad = velocidad *-1;
+                atrasF(velocidad,pAtras);  
+        }
+        else freno(); 
+      }
+    
+  }
+  else{
+    freno(); 
+    errorAcumulado=0;
   }
   
   errorAnterior = error;
+  
   
 }
 

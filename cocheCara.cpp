@@ -56,14 +56,14 @@ int main( int argc, char *argv[] )
   int *jx = &pruebaX; int *jTamano=&pruebaTamano;
   String ipVideo = "http://";
   //String ipVideo = "http://192.168.1.55:8080/?action=stream?dummy=param.jpeg";
-   int resolucion  = atoi(argv[3]);
-  //String resolucion = "ancho ";
   ipVideo.append( argv[1]);//////////////////////
   //resolucion.append( argv[3]);
   cout<<ipVideo<<endl;
   ipVideo.append(":8080/?action=stream");///////////////
   cout<<ipVideo<<endl;
   VideoCapture capture(ipVideo);
+
+   int resolucion  = atoi(argv[3]);
   
  
 	//VideoCapture capture( "http://192.168.1.51:8080/stream_simple.html");
@@ -112,9 +112,9 @@ int main( int argc, char *argv[] )
   //if( !eyes_cascade.load( eyes_cascade_name ) ){ printf("--(!)Error loading\n"); return -1; };
 
   //-- 2. Read the video stream
-  int  contador=0;
+  // int  contador=0;
    capture.open( ipVideo);
- if (resolucion == 320) {
+ if (resolucion == 111) {
     capture.set(CV_CAP_PROP_FRAME_WIDTH,320);
     capture.set(CV_CAP_PROP_FRAME_HEIGHT,240);
     cout<<"RESOLUCION"<<endl;
@@ -146,7 +146,7 @@ int main( int argc, char *argv[] )
     {
 
       capture.read(frame);
-      resize(frame, frame, Size(320, 240), 0, 0, INTER_CUBIC);
+      if  (resolucion == 320) resize(frame, frame, Size(320, 240), 0, 0, INTER_CUBIC);
 	//capture >> frame;
 
       //-- 3. Apply the classifier to the frame
