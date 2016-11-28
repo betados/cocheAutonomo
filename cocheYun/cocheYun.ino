@@ -162,7 +162,7 @@ void mueve(float tamano, bool *pAtras){
   static float errorAnterior=0;
   float dE = errorAnterior-error; 
   
-  int velocidad = error * /*KP*/  40  /* + dE * kd 1*/;
+  int velocidad = error * /*KP*/  30  /* + dE * kd 1*/;
   Serial.print("Velocidad= ");
   Serial.println(velocidad);
   if (velocidad>0) adelante(velocidad,pAtras);
