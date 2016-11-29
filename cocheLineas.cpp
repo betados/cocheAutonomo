@@ -15,6 +15,7 @@ tercer: ancho resolucion captura
 
 #include <iostream>
 #include <stdio.h>
+#include <sstream>
 
 //socket
 #include <stdlib.h>
@@ -146,21 +147,47 @@ int main( int argc, char *argv[] )
 			vector<vector<Point> > contours;
 			findContours(bw, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_NONE);
 			
-			double area[9999];	
-			int indiceAreaMayor=0;
+			double area/*[9999]*/;	
+			double perimetro/*[9999]*/;	
+			float relacion[9999];	
+			int indiceRelacionMejor=1;
 			for (size_t i = 0; i < contours.size(); ++i){
 				
-				area[i] = contourArea(contours[i]);
-				// Ignore contours that are too small or too large
-				if (area[i] < 32e2 || 1e5 < area[i]) continue;
-				drawContours(frame, contours, static_cast<int>(i), Scalar(0, 0, 255), 2, 8, hierarchy, 0);
+				area = contourArea(contours[i]);
 				
-				if (i>0){
-					if (area[i]>area[indiceAreaMayor]) indiceAreaMayor=i;
-				}
+				
+				// Ignore contours that are too small or too large
+				if (area < 32e2 || 1e5 < area) continue;
+				
+				perimetro= arcLength(contours[i],1/*cerrado*/);
+				
+				relacion[i] = perimetro/area;
+				
+				//drawContours(frame, contours, static_cast<int>(i), Scalar(0, 0, 255), 2, 8, hierarchy, 0);
+				//x = getOrientation(contours[i], frame);
+				
+				
+				//convertir a string
+				string Result;          // string which will contain the result
+				ostringstream convert;   // stream used for the conversion
+				convert << relacion[i];      // insert the textual representation of 'Number' in the characters in the stream
+				Result = convert.str(); // set 'Result' to the contents of the stream
+				//putText( frame, Result, Point(x,400), FONT_HERSHEY_SIMPLEX, 0.5, Scalar( 0, 0, 0 ), 1, 8, false );
+				
+				//convert.flush();
+				//Result.clear();
+				convert << " ";
+				convert << x;      // insert the textual representation of 'Number' in the characters in the stream
+				Result = convert.str(); // set 'Result' to the contents of the stream
+				putText( frame, Result, Point(x,415), FONT_HERSHEY_SIMPLEX, 0.5, Scalar( 0, 0, 0 ), 1, 8, false );
+				
+				if (relacion[i]>relacion[indiceRelacionMejor]) indiceRelacionMejor=i;
+				//if ((relacion[i] < 0.05 || 0.5 < relacion[i]) && ((relacion[i]>relacion[indiceRelacionMejor]) || (relacion[indiceRelacionMejor] < 0.05 || 0.5 < relacion[indiceRelacionMejor]) )) indiceRelacionMejor=i;
+				
 			}
-			//cout<<indiceAreaMayor<<endl;
-			x = getOrientation(contours[indiceAreaMayor], frame);
+			//cout<<indiceRelacionMejor<<endl;
+			x = getOrientation(contours[indiceRelacionMejor], frame);
+			cout<< x <<endl;
 			imshow("imagen", frame);
 				
 			///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -174,7 +201,7 @@ int main( int argc, char *argv[] )
 			    //mensaje espurio para reiniciar parseInt() en arduino
 			    
 			    n = write(sockfd,limpia,strlen(limpia));
-			    printf("%s\n", limpia);
+			    //printf("%s\n", limpia);
 			    if (n < 0) 
 			      error("ERROR escribiendo el mensaje espureo");
 			
@@ -191,7 +218,7 @@ int main( int argc, char *argv[] )
 				  {
 				    equis[6+i] = cadena[i];
 				  }
-				printf("%s\n", equis);
+				//printf("%s\n", equis);
 				n = write(sockfd,equis,strlen(equis));
 				if (n < 0) 
 				  error("ERROR writing to socket");
@@ -202,7 +229,7 @@ int main( int argc, char *argv[] )
 			      }
 
 			    n = write(sockfd,limpia,strlen(limpia));
-			    printf("%s\n", limpia);
+			    //printf("%s\n", limpia);
 			    if (n < 0)  error("ERROR escribiendo el mensaje espureo");
 
 			/*
@@ -305,7 +332,7 @@ int getOrientation(const vector<Point> &pts, Mat &img)
     //Store the center of the object
     Point cntr = Point(static_cast<int>(pca_analysis.mean.at<double>(0, 0)),
                       static_cast<int>(pca_analysis.mean.at<double>(0, 1)));
-	cout<<cntr.x<<endl;
+	//cout<<cntr.x<<endl;
     //Store the eigenvalues and eigenvectors
     vector<Point2d> eigen_vecs(2);
     vector<double> eigen_val(2);
@@ -346,7 +373,53 @@ int grosor = 110	;
             1,
             Scalar( 150, 150, 150 ),
             lineType );
- }
+///////////////////////////////////////////////////////////////////////////////////////	////////////
+ grosor=3;
+  rook_points[0][0] = Point(0, 0 );
+  rook_points[0][1] = Point(grosor,0);
+  rook_points[0][2] = Point( grosor, img.rows-1 );
+  rook_points[0][3] = Point( 0, img.rows-1);
+	
+  //ppt[0] =  rook_points[0] ;
+
+  fillPoly( img,
+            ppt,
+            npt,
+            1,
+            Scalar( 150, 150, 150 ),
+            lineType );
+///////////////////////////////////////////////////////////////////////////////////////	////////////
+
+  rook_points[0][0] = Point(0, 0 );
+  rook_points[0][1] = Point(0,grosor);
+  rook_points[0][2] = Point( img.cols-1,grosor );
+  rook_points[0][3] = Point( img.cols-1, 0);
+	
+  //ppt[0] =  rook_points[0] ;
+
+  fillPoly( img,
+            ppt,
+            npt,
+            1,
+            Scalar( 150, 150, 150 ),
+            lineType );
+
+///////////////////////////////////////////////////////////////////////////////////////	////////////
+
+  rook_points[0][0] = Point(img.cols-1, 0 );
+  rook_points[0][1] = Point(img.cols-1,img.rows-1);
+  rook_points[0][2] = Point(img.cols-1-grosor,img.rows-1 );
+  rook_points[0][3] = Point(img.cols-1-grosor, 0);
+	
+  //ppt[0] =  rook_points[0] ;
+
+  fillPoly( img,
+            ppt,
+            npt,
+            1,
+            Scalar( 150, 150, 150 ),
+            lineType );
+}
 
 void error(const char *msg)
 {
