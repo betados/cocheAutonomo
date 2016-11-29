@@ -17,18 +17,8 @@ void MyPolygon( Mat );
 
 int main(int argc, char** argv)
 {
-/*
-	String ipVideo = "http://";
-		  //String ipVideo = "http://192.168.1.55:8080/?action=stream?dummy=param.jpeg";
-	ipVideo.append( argv[1]);//////////////////////
-		  //resolucion.append( argv[3]);
-	cout<<ipVideo<<endl;
-	ipVideo.append(":8080/?action=stream");///////////////
-	cout<<ipVideo<<endl;*/
+
 	VideoCapture capture(0);
-	
-//const char* filename = argc >= 2 ? argv[1] : "pic1.jpg";
-	//float azul=100, rojo=100, verde =100;
  capture.open( 0);
 
   if( capture.isOpened() )
@@ -48,90 +38,13 @@ int main(int argc, char** argv)
 
   /// Convert the image to grayscale
   		
-		 //cvtColor(dst, cdst, CV_GRAY2BGR);
-		//if  (resolucion == 320) resize(frame, frame, Size(320, 240), 0, 0, INTER_CUBIC);
-		//capture >> frame;
+
 
       	//-- 3. Apply the classifier to the frame
 		if( !frame.empty() )
 			{
 
-				/*
-				cvtColor( frame, frameGray, CV_BGR2GRAY );
-				blur( frameGray, detected_edges, Size(3,3) );
-			 	Canny(frameGray, dst, 200, 600, 3);
-				#if 0
-				  vector<Vec2f> lines;
-				  HoughLines(dst, lines, 1, CV_PI/180, 100, 0, 0 );
-
-				  for( size_t i = 0; i < lines.size(); i++ )
-				  {
-					 float rho = lines[i][0], theta = lines[i][1];
-					 Point pt1, pt2;
-					 double a = cos(theta), b = sin(theta);
-					 double x0 = a*rho, y0 = b*rho;
-					 pt1.x = cvRound(x0 + 1000*(-b));
-					 pt1.y = cvRound(y0 + 1000*(a));
-					 pt2.x = cvRound(x0 - 1000*(-b));
-					 pt2.y = cvRound(y0 - 1000*(a));
-					 line( cdst, pt1, pt2, Scalar(0,0,255), 3, CV_AA);
-				  }
-				 #else
-				  vector<Vec4i> lines;
-
 					
-				  HoughLinesP(dst, lines, 1, CV_PI/180, 50, 50, 10 );
-				  for( size_t i = 0; i < lines.size(); i++ )
-				  {
-					Vec4i l = lines[i];
-					line( cdst, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0,0,255), 3, CV_AA);
-				  }
-
-
-		//GaussianBlur( frameGray, framGray, Size(9, 9), 2, 2 );
-
-
-				 #endif
-	*/			
-	/*			
-				
-				//extraer solo las cosas negras//////////////////////////////////////////////////
-				for(int y=0;y<frame.rows;y++)
-				{
-					//if (rojo>0.0005) cout<<rojo<<endl;
-					for(int x=0;x<frame.cols;x++)
-					{
-						// get pixel
-						Vec3b color = frame.at<Vec3b>(Point(x,y));
-						
-						//media de cada color
-						azul=azul+(color[0]-azul)/(frame.cols*frame.rows);
-						verde=verde+(color[1]-verde)/(frame.cols*frame.rows);
-						rojo=rojo+(color[2]-rojo)/(frame.cols*frame.rows);
-						
-
-						// ... do something to the color ....
-						float multiplicador=0.4f;
-						if (color[0] < azul*multiplicador && color[1] < verde*multiplicador && color[2] < rojo*multiplicador){
-							// set pixel
-							//cout<<color<<endl;
-							color[0]=255;
-							color[1]=255;
-							color[2]=255;
-							//cout<<rojo<<endl;
-							
-						}
-						else {
-							// set pixel
-							color[0]=0;
-							color[1]=0;
-							color[2]=0;
-						}
-						frameNegro.at<Vec3b>(Point(x,y)) = color;
-					}
-				}
-				
-		*/		
 				
 				
 	//////////////////////////////////////contorno y direccion///////////////////////////////////////////////
@@ -161,41 +74,9 @@ int main(int argc, char** argv)
 			//cout<<indiceAreaMayor<<endl;
 			getOrientation(contours[indiceAreaMayor], frame);
 				
-			/*	
-			for (size_t i = 0; i < contours.size(); ++i)
-			{
-				// Calculate the area of each contour
-				double areau = contourArea(contours[i]);
-				// Ignore contours that are too small or too large
-				if (areau < 32e2 || 1e5 < areau) continue;
-				// Draw each contour only for visualisation purposes
-				//drawContours(frame, contours, static_cast<int>(i), Scalar(0, 0, 255), 2, 8, hierarchy, 0);
-				// Find the orientation of each shape
-				getOrientation(contours[i], frame);
-			}*/
+			
 				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-//////////convertir a binario//////////////////////
-/*				 0: Binary
-			     1: Binary Inverted
- 			    2: Threshold Truncated
-  				   3: Threshold to Zero
- 			    4: Threshold to Zero Inverted
-   */
-  //threshold( dst, dst, 130, 255,0);
-
-				//andeir();
 				 imshow("source", frame);
-				 //imshow("detected lines", dst);
-				//imshow("frameNegro", frameNegro);
 			}
 		int c = waitKey(1);
 		if( (char)c == 'c'|| c == 27 ) { break; }
@@ -204,34 +85,6 @@ int main(int argc, char** argv)
   }
   else cout<<"mierda pa ti"<<endl;
 	return(0);
-}
-void andeir()
-{
-	Point pt1(dst.cols/2,dst.rows), pt2(0,0);
-
-	
-	for (int fila=dst.rows; fila>0; fila--){
-		int acumulado=0,contador=0;
-		for (int columna=0;columna<dst.cols;columna++){
-			if (dst.at<bool>(fila,columna) > 100){
-				acumulado+=columna;
-				contador++;
-				//cout<<columna<<endl;
-			}
-		}
-		
-		if (contador > 0){
-			pt2.x=acumulado/contador;
-			pt2.y=fila;
-			cout<<pt2<<endl;
-		}
-		line( dst, pt1,  pt2, CV_RGB(255, 255, 255), /* thickness=*/1	,  /*lineType=*/8,  /*shift=*/0);
-		pt1=pt2;
-	}	
-
-	
-	//imshow("pintao", *marco);
-	
 }
 
 void drawAxis(Mat& img, Point p, Point q, Scalar colour, const float scale = 0.2)

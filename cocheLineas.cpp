@@ -103,7 +103,8 @@ int main( int argc, char *argv[] )
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+int vecinos=361;
+			int C=11;
 
   //-- 2. Read the video stream
   
@@ -141,8 +142,23 @@ int main( int argc, char *argv[] )
 			cvtColor(frame, frame, COLOR_BGR2GRAY);
 			// Convert image to binary
 			Mat bw;
-			threshold(frame, bw, 50, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+			//threshold(frame, bw, 50, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+			
+	adaptiveThreshold(frame, bw, 	 255, 
+					   ADAPTIVE_THRESH_MEAN_C
+					 //ADAPTIVE_THRESH_GAUSSIAN_C
+					  , THRESH_BINARY,vecinos, C); //funciona mejor con papel marron, claro. Pero tambien se confunde con el parquet
 			// Find all the contours in the thresholded image
+			int l = waitKey(1);
+      		if( (char)l == 'q' ) vecinos+=2;
+      		if( (char)l == 'a' ) vecinos-=2;
+      		if( (char)l == 'w' ) C++;
+      		if( (char)l == 's' ) C--;
+			
+			//cout<<"vecinos: "<<vecinos<<endl;
+			//cout<<"C: "<<C<<endl;
+			
+			
 			vector<Vec4i> hierarchy;
 			vector<vector<Point> > contours;
 			findContours(bw, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_NONE);
@@ -163,7 +179,7 @@ int main( int argc, char *argv[] )
 				
 				relacion[i] = perimetro/area;
 				
-				//drawContours(frame, contours, static_cast<int>(i), Scalar(0, 0, 255), 2, 8, hierarchy, 0);
+				drawContours(frame, contours, static_cast<int>(i), Scalar(255, 255, 255), 2, 8, hierarchy, 0);
 				//x = getOrientation(contours[i], frame);
 				
 				
@@ -187,8 +203,9 @@ int main( int argc, char *argv[] )
 			}
 			//cout<<indiceRelacionMejor<<endl;
 			x = getOrientation(contours[indiceRelacionMejor], frame);
-			cout<< x <<endl;
+			//cout<< x <<endl;
 			imshow("imagen", frame);
+			//imshow("BW", bw);
 				
 			///////////////////////////////////////////////////////////////////////////////////////////////////////
 			
@@ -354,6 +371,7 @@ int getOrientation(const vector<Point> &pts, Mat &img)
 }
 void MyPolygon( Mat img )
 {
+	int color=90;
   int lineType = 8;
 int grosor = 110	;
 
@@ -371,7 +389,7 @@ int grosor = 110	;
             ppt,
             npt,
             1,
-            Scalar( 150, 150, 150 ),
+            Scalar( color, color, color ),
             lineType );
 ///////////////////////////////////////////////////////////////////////////////////////	////////////
  grosor=3;
@@ -386,7 +404,7 @@ int grosor = 110	;
             ppt,
             npt,
             1,
-            Scalar( 150, 150, 150 ),
+            Scalar( color, color, color ),
             lineType );
 ///////////////////////////////////////////////////////////////////////////////////////	////////////
 
@@ -401,7 +419,7 @@ int grosor = 110	;
             ppt,
             npt,
             1,
-            Scalar( 150, 150, 150 ),
+            Scalar( color, color, color ),
             lineType );
 
 ///////////////////////////////////////////////////////////////////////////////////////	////////////
@@ -417,7 +435,7 @@ int grosor = 110	;
             ppt,
             npt,
             1,
-            Scalar( 150, 150, 150 ),
+            Scalar( color, color, color ),
             lineType );
 }
 

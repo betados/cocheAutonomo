@@ -91,7 +91,7 @@ void loop() {
               Serial.print(commandS);
               Serial.println(command); 
               gira(command,atras);
-              adelante(100,pAtras);
+              adelante(80,pAtras);
             }
             if (commandS=="tamano"){
               //Serial.print(commandS);
