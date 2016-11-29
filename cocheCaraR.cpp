@@ -1,5 +1,4 @@
 /**
-
 Recibe la imagen, la analiza y reenvia por socket los datos 
 primer parametro: ip servidor
 segundo: puerto de la comunicacion socket
@@ -16,7 +15,7 @@ tercer: ancho resolucion captura
 #include <iostream>
 #include <stdio.h>
 
-//socket
+//socket?dummy=param.mjpeg
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
@@ -43,7 +42,7 @@ String face_cascade_name = "haar/lbpcascade_frontalface.xml";
 CascadeClassifier face_cascade;
 CascadeClassifier eyes_cascade;
 string window_name = "Capture - Face detection";
-//RNG rng(12345);
+RNG rng(12345);
 
 /**
  * @function main
@@ -56,14 +55,14 @@ int main( int argc, char *argv[] )
   int *jx = &pruebaX; int *jTamano=&pruebaTamano;
   String ipVideo = "http://";
   //String ipVideo = "http://192.168.1.55:8080/?action=stream?dummy=param.jpeg";
+   int resolucion  = atoi(argv[3]);
+  //String resolucion = "ancho ";
   ipVideo.append( argv[1]);//////////////////////
   //resolucion.append( argv[3]);
   cout<<ipVideo<<endl;
   ipVideo.append(":8080/?action=stream?dummy=param.mjpeg");///////////////
   cout<<ipVideo<<endl;
   VideoCapture capture(ipVideo);
-
-   int resolucion  = atoi(argv[3]);
   
  
 	//VideoCapture capture( "http://192.168.1.51:8080/stream_simple.html");
@@ -112,7 +111,7 @@ int main( int argc, char *argv[] )
   //if( !eyes_cascade.load( eyes_cascade_name ) ){ printf("--(!)Error loading\n"); return -1; };
 
   //-- 2. Read the video stream
-  
+  int  contador=0;
    capture.open( ipVideo);
  if (resolucion == 320) {
     capture.set(CV_CAP_PROP_FRAME_WIDTH,320);
@@ -120,9 +119,8 @@ int main( int argc, char *argv[] )
     cout<<"RESOLUCION"<<endl;
   }
 
- /* int  contador=0;
-   do{
-     // int  contador=0;
+   
+   /*do{
      capture.open( ipVideo);
      //capture.set(CV_CAP_PROP_FRAME_WIDTH,320);
      //capture.set(CV_CAP_PROP_FRAME_HEIGHT,240);
@@ -131,9 +129,9 @@ int main( int argc, char *argv[] )
      if (contador>999){
      cout<<"Esto no arranca"<<endl;
      break;
-     }
+  }
   	
-     }while(!capture.isOpened());*/
+  }while(!capture.isOpened());*/
 
    
 //capture.open( "http://192.168.1.51:8080/stream_simple.html");
@@ -147,7 +145,7 @@ int main( int argc, char *argv[] )
     {
 
       capture.read(frame);
-      if  (resolucion == 320) resize(frame, frame, Size(320, 240), 0, 0, INTER_CUBIC);
+      resize(frame, frame, Size(320, 240), 0, 0, INTER_CUBIC);
 	//capture >> frame;
 
       //-- 3. Apply the classifier to the frame
@@ -264,7 +262,6 @@ int detectAndDisplay( Mat frame, int *jx, int *jTamano )
 /*
       //-- In each face, detect eyes
       eyes_cascade.detectMultiScale( faceROI, eyes, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, Size(30, 30) );
-
       for( size_t j = 0; j < eyes.size(); j++ )
        {
          Point eye_center( faces[i].x + eyes[j].x + eyes[j].width/2, faces[i].y + eyes[j].y + eyes[j].height/2 );
